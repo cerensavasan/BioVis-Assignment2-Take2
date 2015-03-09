@@ -90,16 +90,20 @@ void updateNodes(){
           min = getNodeDistance(listOfNodes[i],listOfNodes[j]);
           x=i;
           y=j;
+          println("Nodes being compared are: Node " + i + " and Node " + j);  
           println("Minimum is: " + min);
         }
+        
+        if(listOfNodes[x].nodeOf.length == 1 || listOfNodes[y].nodeOf.length == 1){
+         textPos = textPos + 3;
+        }
+        
       }
     }
-    
-    if(listOfNodes[x].nodeOf.length == 1 || listOfNodes[y].nodeOf.length == 1){
-         textPos = textPos + 3;
-       }
-    listOfNodes2 = (Node[])append(listOfNodes2, mergeNodes(listOfNodes[x], listOfNodes[y], count, textPos));  
     count++;
+    
+    listOfNodes2 = (Node[])append(listOfNodes2, mergeNodes(listOfNodes[x], listOfNodes[y], count, textPos));  
+    
     for(int b = 0; b < listOfNodes.length; b++) {
       if(b != x && b != y){
         listOfNodes2 = (Node[])append(listOfNodes2,listOfNodes[b]);
@@ -116,31 +120,39 @@ void setup() {
   
   parseTable();  
   println("Length of list after parse: " + listOfNodes.length);
-  updateNodes();
-  println("Length of list after update: " + listOfNodes.length);
   
   stroke(0);
   fill(50);
   
+  updateNodes();
+  println("Length of list after update: " + listOfNodes.length);
+  
+  /*
   for(int i=0; i<listOfNodes.length; i++){
     println("Length of end list is: " + listOfNodes.length);
-    println(listOfNodes[i].nodeOf[0].name);
+    for(int j = 0; j < listOfNodes[i].nodeOf.length; j++){
+      println(listOfNodes[i].nodeOf[j].name);
+    }
   }
+  */
   
   int levelCount = 1;
   int hasDouble = 0;
   for(int i=0; i<listOfNodes.length; i++){
-    println("current level count is: " + levelCount);
+   for(int j = 0; j < listOfNodes[i].nodeOf.length; j++){
     if(listOfNodes[i].level == levelCount) {
       println(listOfNodes[i].nodeOf[0].name);
       println(listOfNodes[i].level);
       textSize(12);
       text(listOfNodes[i].nodeOf[0].name, 350 + 100*i, 20 * levelCount);
       hasDouble++;
-    }
-   if(hasDouble == 2){
-     println("Incrementing level count");
-     levelCount++; 
+       if(hasDouble == 2){
+         println("Incrementing level count");
+         hasDouble = 2;
+         levelCount++;
+       }
+     } 
    } 
-  }
+ }
 }
+
