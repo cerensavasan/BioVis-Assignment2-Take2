@@ -1,4 +1,4 @@
-# BioVis-Assignment2-Take2
+#Biovisualization - CS4802 - Assignment2
 
 ###How does this program perform hierarchical clustering?
 There are two main classes that I have used to create the clustering algorithm. The "Animal" class holds the actual attributes and the name of the animal being processed into nodes. The "Node" class holds any animals that have been clustered together in an array of Animals. When finding the distance between two animals, the algorithm simply compares the attributes array of each animal and counts the differences. When calculating the distance between two nodes, the algorithm finds the average of distances between the two Animal arrays of the two nodes. The "updateNodes" function then iterates through the whole list of nodes and clusters the closest ones together.
