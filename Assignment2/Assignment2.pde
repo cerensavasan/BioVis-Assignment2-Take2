@@ -2,180 +2,145 @@
 //by Ceren Savasan
 //username: csavasan
 
-PrintWriter output;
+//Holds all of the nodes in the tree
+Node[] listOfNodes = new Node[101];
 
-public ArrayList<Node> clusterKeeper = new ArrayList<Node>();
-
-int largeMinimum = 999;
-
-abstract class Node{
-  Node parent;
-  ArrayList<Integer> distances;
+//-------------------------------CLASS DECLERATIONS--------------------------------------//
+class Node{
+  Animal[] nodeOf;
+  int level;
 }
 
-
-class Cluster extends Node{
-  Node node1;
-  Node node2;
-  int distance;
-  
-  Cluster(Node node1, Node node2, int thisDistance){
-    this.node1 = node1;
-    this.node2 = node2;
-    distance = thisDistance;
-  }
-}
-
-class Animal extends Node{
+class Animal{
   String name;
-  String[] attributes;
+  int[] attributes;
  
   //Use this to create a new animal with custom attributes
-  Animal(String new_name, String new_h, String new_feat, String new_e, String new_m, String new_a, String new_aqua, String new_p, String new_tooth, String new_back, String new_brea, String new_ven, String new_fin, String new_leg, String new_tail, String new_dom, String new_cat, String new_type){
+  Animal(String new_name, int[] new_attributes){
     name = new_name;
-    distances = new ArrayList<Integer>();
-    attributes[0] = new_name;
-    attributes[1] = new_h;
-    attributes[2] = new_feat;
-    attributes[3] = new_e;
-    attributes[4] = new_m;
-    attributes[5] = new_a;
-    attributes[6] = new_aqua;
-    attributes[7] = new_p;
-    attributes[8] = new_tooth;
-    attributes[9] = new_back;
-    attributes[10] = new_brea;
-    attributes[11] = new_ven;
-    attributes[12] = new_fin;
-    attributes[13] = new_leg;
-    attributes[14] = new_tail;
-    attributes[15] = new_dom;
-    attributes[16] = new_cat;
-    attributes[17] = new_type;
+    attributes = new_attributes;
   }
 }
-
-//initate a bunch of animals
-Animal aardvark = new Animal("aardvark", "true", "false", "false", "true", "false", "false", "true", "true", "true", "true", "false", "false", "4", "false", "false", "true", "1");
-Animal antelope = new Animal("antelope", "true", "false",  "false", "true", "false", "false",  "false",  "true",  "true", "true" , "false" , "false" , "4", "true",  "false",  "true",  "1");
-Animal bass = new Animal("bass", "false", "false", "true", "false", "false",  "true",  "true",  "true",  "true",  "false",  "false",  "true",  "0",  "true",  "false",  "false",  "4");
-Animal bear = new Animal("bear", "true",  "false",  "false", "true",  "false",  "false",  "true",  "true",  "true",  "true",  "false",  "false",  "4",  "false",  "false",  "true", "1");
-Animal clam = new Animal("clam", "false",  "false",  "true",  "false",  "false",  "false",  "true",  "false",  "false",  "false",  "false",  "false",  "0", "false", "false",  "false",  "7");
-Animal elephant = new Animal("elephant", "true", "false", "false", "true", "false", "false", "false", "true", "true", "true", "false", "false", "4", "true", "false", "true", "1");
-Animal human = new Animal("human", "true",  "false", "false", "true", "false", "false", "true" , "true" ,"true", "true", "false", "false", "2", "false", "true", "true", "1");
-Animal kiwi = new Animal("kiwi", "false", "true", "true", "false", "false", "false", "true", "false", "true", "true", "false", "false", "2", "true", "false", "false", "2");
-
-
-ArrayList<Animal> animals = new ArrayList<Animal>();
-
-void addAnimals(){
-  output.println("About to add animals");
-  animals.add(aardvark);
-  animals.add(antelope);
-  animals.add(bass);
-  animals.add(bear);
-  animals.add(clam);
-  animals.add(elephant);
-  animals.add(human);
-  animals.add(kiwi);
-  output.println("just added all animals");
-}
-
-
-
-//initalize clusters list as one animal in each cluster
-void populateNodes(){
-  for(int counter = 0; counter < animals.size(); counter++){
-    clusterKeeper.add(animals.get(counter));
-  }
-}
-
-void initializeFirstDistances(){
-  for(int counter = 0; counter < animals.size(); counter++){
-    for(int counter2 = 0; counter2 < animals.size() ; counter2++){
-      int difference = 0;
-      for(int attrCount = 1; attrCount < 18; attrCount++){
-        if(((animals.get(counter).attributes[attrCount]) == (animals.get(counter2).attributes[attrCount])) == false){
-          difference++;
-          //WAT DO weight[attrCount];
-        }
-      }
-      animals.get(counter).distances.add(difference);
-      print(animals.get(counter).distances.get(counter2) + ", ");
+//-------------------------------THE DISTANCE BETWEEN TWO ANIMALS---------------------------------------//
+int getAnimalDistance(Animal a1, Animal a2){
+  int count = 0;
+  for(int i = 0; i < 16; i++){
+    if(a1.attributes[i] != a2.attributes[i]){
+      count++;
     }
-    println();
   }
+  return count;
 }
-
-void makeClusters(){
-  int currentMinDistance;
-  //indexes of node1 and node2
-  int i1;
-  int i2;
-  
-  //eventually we will only have 1 node in that list
-  while((clusterKeeper.size() > 1) && (clusterKeeper.size() != 1)){
-    currentMinDistance = 999; //some arbitrary large number to check against
-    i1 = 0;
-    i2 = 0;
-    for(int counter = 0; counter < clusterKeeper.size(); counter++){
-      for(int counter2 = counter + 1; counter2 < clusterKeeper.size(); counter2++){
-        if((counter < counter2) && (clusterKeeper.get(counter).distances.get(counter2) < currentMinDistance)){
-          currentMinDistance = clusterKeeper.get(counter).distances.get(counter2);
-          i1 = counter;  //we have now decided what nodes need to get clustered together
-          i2 = counter2;
+//-------------------------------THE DISTANCE BETWEEN TWO NODES---------------------------------------//
+int getNodeDistance(Node n1, Node n2){
+  int count = 0;
+  for(int i = 0; i < n1.nodeOf.length; i++){
+    for(int j = 0; j < n2.nodeOf.length; j++){
+      count = count + getAnimalDistance(n1.nodeOf[i], n2.nodeOf[j]);
+    }
+  }
+  //get average
+  count = count / (n1.nodeOf.length * n2.nodeOf.length);
+  return count;
+}
+//-------------------------------PARSE OUT ZOO TABLE INTO LIST---------------------------------------//
+Node[] parseTable(){
+  String[] zooData = loadStrings("zoo.data");
+  int level = 1;
+  for(int i = 0; i < zooData.length; i++){
+    int[] temporary = new int[16]; //number of attributes
+    String[] temporary2 = split(zooData[i],",");
+    for(int j = 0; j < 16; j++){     
+      temporary[j] = int(temporary2[j+1]);
+    }
+    Node cluster = new Node();
+    cluster.nodeOf = new Animal[1];
+    cluster.nodeOf[0] = new Animal(temporary2[0], temporary);
+    cluster.level = level;
+    listOfNodes[i] = cluster;
+  }
+  return listOfNodes;
+}
+//-----------------------------------MERGE NODES---------------------------------------//
+Node mergeNodes(Node n1, Node n2, int lengthOf, int heightOf){
+  String saveName = null;
+  Node n3 = new Node();
+  for(int i = 0; i < n2.nodeOf.length; i++) {
+    n1.nodeOf = (Animal[])append(n1.nodeOf, n2.nodeOf[i]);
+    saveName = n2.nodeOf[i].name;
+  }
+  n3.nodeOf = n1.nodeOf;
+  n3.level = lengthOf + 1;
+  return n3;
+}
+//-------------------------------UPDATE NODES---------------------------------------//
+void updateNodes(){
+  int count = 1;
+  int textPos = 1;
+  float min = getNodeDistance(listOfNodes[0], listOfNodes[1]);
+  int x = 0;
+  int y = 1;
+  // clustering
+  for(int a = 0; a < 98; a++) {
+    Node[] listOfNodes2 = new Node[0];
+    //find minimum distance    
+    for(int i = 0; i < listOfNodes.length; i++){
+      for(int j = 0; j < listOfNodes.length; j++){
+        if(i != j && (min > getNodeDistance(listOfNodes[i],listOfNodes[j]))){
+          min = getNodeDistance(listOfNodes[i],listOfNodes[j]);
+          x=i;
+          y=j;
+          println("Minimum is: " + min);
         }
       }
     }
-  
-   //calculate new distances for them
-  for(int counter = 0; counter < clusterKeeper.size(); counter++){
-    if(counter != i1){ //check that we are not checking it with itself
-      //set new distances
-      clusterKeeper.get(i1).distances.set(counter, clusterKeeper.get(counter).distances.get(i1));
-      clusterKeeper.get(counter).distances.set(i1 , min(clusterKeeper.get(counter).distances.get(i2), clusterKeeper.get(counter).distances.get(i1)));
-     
-      //now remove current second cluster
-      clusterKeeper.get(counter).distances.remove(i2);
+    
+    if(listOfNodes[x].nodeOf.length == 1 || listOfNodes[y].nodeOf.length == 1){
+         textPos = textPos + 3;
+       }
+    listOfNodes2 = (Node[])append(listOfNodes2, mergeNodes(listOfNodes[x], listOfNodes[y], count, textPos));  
+    count++;
+    for(int b = 0; b < listOfNodes.length; b++) {
+      if(b != x && b != y){
+        listOfNodes2 = (Node[])append(listOfNodes2,listOfNodes[b]);
+      }
     }
+    listOfNodes = listOfNodes2;
+  }
+}
+//-------------------------------SETUP AND DRAW TREE---------------------------------------//
+void setup() {
+  size(1000,800);
+  stroke(0);
+  background(255);
+  
+  parseTable();  
+  println("Length of list after parse: " + listOfNodes.length);
+  updateNodes();
+  println("Length of list after update: " + listOfNodes.length);
+  
+  stroke(0);
+  fill(50);
+  
+  for(int i=0; i<listOfNodes.length; i++){
+    println("Length of end list is: " + listOfNodes.length);
+    println(listOfNodes[i].nodeOf[0].name);
   }
   
-  //get the first cluster's distances
-  ArrayList<Integer> new_distances = clusterKeeper.get(i1).distances;
-  
-  //remove that distance from first cluster's
-  clusterKeeper.get(i1).distances.remove(i2);
-  
-   //so now we will actually cluster them and add that new cluster to the list
-  //remove them from the list
-  Node new_node1 = clusterKeeper.get(i1);
-  Node new_node2 = clusterKeeper.get(i2-1); //-1 because removing first node removed 1 from that list
-  
-  clusterKeeper.remove(i1);
-  clusterKeeper.remove(i2-1);
-  
-  //add to list of clusters this new cluster
-  clusterKeeper.add(i1, new Cluster(new_node1, new_node2, currentMinDistance));
-  
-  //set those new distances
-  clusterKeeper.get(i1).distances = new_distances;
- }
+  int levelCount = 1;
+  int hasDouble = 0;
+  for(int i=0; i<listOfNodes.length; i++){
+    println("current level count is: " + levelCount);
+    if(listOfNodes[i].level == levelCount) {
+      println(listOfNodes[i].nodeOf[0].name);
+      println(listOfNodes[i].level);
+      textSize(12);
+      text(listOfNodes[i].nodeOf[0].name, 350 + 100*i, 20 * levelCount);
+      hasDouble++;
+    }
+   if(hasDouble == 2){
+     println("Incrementing level count");
+     levelCount++; 
+   } 
+  }
 }
-
-void setup() 
-{  //setup function called initially, only once
-  output = createWriter("log.txt");
-  //addAnimals();
-  output.println("about to populate nodes");
-  //populateNodes();
-  output.println("finished populating nodes, now gonna initalize distances");
-  //initializeFirstDistances();
-  output.println("finished initalizing distances, now gonna make clusters");
-  //makeClusters();
-  output.println("finished making clusters, launching window");
-  size(1000, 400);
-  background(255);  //set background white
-  colorMode(RGB);   //set colors to Hue, Saturation, Brightness mode
-  output.close();
-}
-
